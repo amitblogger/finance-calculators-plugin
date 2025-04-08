@@ -1,1 +1,45 @@
+.fcp-container {
+  text-align: center;
+  padding: 40px;
+  font-family: 'Arial', sans-serif;
+}
+
+.fcp-title {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.fcp-subtitle {
+  font-size: 1.2rem;
+  color: #777;
+  margin-bottom: 30px;
+}
+
+.fcp-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.fcp-grid-item {
+  padding: 20px;
+  border-radius: 12px;
+  background: #f2f2f2;
+  transition: 0.3s;
+  text-decoration: none;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.fcp-grid-item:hover {
+  background: #d9e9ff;
+  color: #000;
+}
+
+.fcp-grid-item img {
+  width: 60px;
+  margin-bottom: 10px;
+}
 
