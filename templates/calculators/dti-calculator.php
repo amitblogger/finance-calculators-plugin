@@ -18,7 +18,14 @@
   </form>
 
   <div id="dtiResult" style="margin-top: 20px;"></div>
+  <canvas id="dtiChart" width="400" height="250" style="margin-top:30px;"></canvas>
+  <div style="margin-top: 20px;">
+    <button onclick="downloadDTIPDF()">Export Result to PDF</button>
+  </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
 function calculateDTI() {
@@ -43,5 +50,37 @@ function calculateDTI() {
     <h3>Your DTI: ${dti.toFixed(2)}%</h3>
     <p>Status: <strong>${status}</strong></p>
   `;
+
+  drawDTIChart(dti, 100 - dti);
+}
+
+function drawDTIChart(dtiPercent, rest) {
+  const ctx = document.getElementById('dtiChart').getContext('2d');
+  if (window.dtiChart) window.dtiChart.destroy();
+  window.dtiChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: ['Debt', 'Remaining Income'],
+      datasets: [{
+        data: [dtiPercent, rest],
+        backgroundColor: ['#FF9800', '#03A9F4'],
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'bottom' }
+      }
+    }
+  });
+}
+
+function downloadDTIPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  doc.text("Debt-to-Income Ratio Result", 10, 10);
+  const content = document.getElementById('dtiResult');
+  doc.fromHTML(content.innerHTML, 10, 20);
+  doc.save("dti-result.pdf");
 }
 </script>
