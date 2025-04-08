@@ -5,7 +5,7 @@
   <form id="personalLoanForm">
     <label>Loan Amount: <input type="number" id="pLoanAmount" required></label><br><br>
     <label>Interest Rate (% per annum): <input type="number" id="pInterestRate" required></label><br><br>
-    <label>Loan Tenure (in Years): <input type="number" id="pLoanTenure" required></label><br><br>
+    <label>Loan Tenure (Years): <input type="number" id="pLoanTenure" required></label><br><br>
     <label>Currency:
       <select id="pCurrency">
         <option value="INR">INR</option>
@@ -19,7 +19,14 @@
   </form>
 
   <div id="personalLoanResult" style="margin-top: 20px;"></div>
+  <canvas id="personalLoanChart" width="400" height="250" style="margin-top:30px;"></canvas>
+  <div style="margin-top: 20px;">
+    <button onclick="downloadPersonalLoanPDF()">Export Result to PDF</button>
+  </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
 function calculatePersonalLoan() {
@@ -38,11 +45,43 @@ function calculatePersonalLoan() {
   const totalInterest = totalPayable - P;
 
   document.getElementById('personalLoanResult').innerHTML = `
-    <h3>Estimated EMI: ${currency} ${emi.toFixed(2)} per month</h3>
+    <h3>Estimated EMI: ${currency} ${emi.toFixed(2)} / month</h3>
     <ul>
       <li><strong>Total Interest:</strong> ${currency} ${totalInterest.toFixed(2)}</li>
       <li><strong>Total Payment:</strong> ${currency} ${totalPayable.toFixed(2)}</li>
     </ul>
   `;
+
+  drawPersonalLoanChart(P, totalInterest);
+}
+
+function drawPersonalLoanChart(principal, interest) {
+  const ctx = document.getElementById('personalLoanChart').getContext('2d');
+  if (window.plChart) window.plChart.destroy();
+  window.plChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: ['Principal', 'Interest'],
+      datasets: [{
+        data: [principal, interest],
+        backgroundColor: ['#2196F3', '#FF5722'],
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'bottom' }
+      }
+    }
+  });
+}
+
+function downloadPersonalLoanPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  doc.text("Personal Loan EMI Result", 10, 10);
+  const content = document.getElementById('personalLoanResult');
+  doc.fromHTML(content.innerHTML, 10, 20);
+  doc.save("personal-loan-emi.pdf");
 }
 </script>
