@@ -19,7 +19,12 @@
   </form>
 
   <div id="amortResult" style="margin-top: 20px;"></div>
+  <div style="margin-top: 20px;">
+    <button onclick="downloadAmortPDF()">Export to PDF</button>
+  </div>
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
 function generateSchedule() {
@@ -46,5 +51,14 @@ function generateSchedule() {
 
   result += "</table>";
   document.getElementById('amortResult').innerHTML = result;
+}
+
+function downloadAmortPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  doc.text("Amortization Schedule", 10, 10);
+  const content = document.getElementById('amortResult');
+  doc.fromHTML(content.innerHTML, 10, 20);
+  doc.save("amortization-schedule.pdf");
 }
 </script>
