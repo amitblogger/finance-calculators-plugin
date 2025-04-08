@@ -1,6 +1,17 @@
 <div class="fcp-container">
   <h1 class="fcp-title">Finance Calculators</h1>
   <p class="fcp-subtitle">Calculate smart. Plan better. Grow faster.</p>
+
+  <!-- 🌗 Dark Mode Toggle Button -->
+  <button id="fcp-theme-toggle" style="position: fixed; top: 15px; right: 15px; z-index: 999;">
+    🌓 Toggle Theme
+  </button>
+
+  <!-- 💰 AdSense Placeholder -->
+  <div class="fcp-ad" style="margin: 20px 0; text-align:center;">
+    <p style="font-size: 14px; color: gray;">[Your Google AdSense Ad Here]</p>
+  </div>
+
   <div class="fcp-grid">
     <?php
     $categories = [
