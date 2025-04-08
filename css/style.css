@@ -42,4 +42,74 @@
   width: 60px;
   margin-bottom: 10px;
 }
+/* 🌙 Dark Mode Styling */
+body.fcp-dark-mode {
+  background-color: #121212;
+  color: #f0f0f0;
+}
+
+.fcp-dark-mode input,
+.fcp-dark-mode select,
+.fcp-dark-mode button {
+  background-color: #222;
+  color: #fff;
+  border: 1px solid #555;
+}
+
+.fcp-dark-mode .fcp-container {
+  background-color: #1e1e1e;
+}
+
+/* 📱 Responsive Layout */
+.fcp-container {
+  text-align: center;
+  padding: 40px;
+  font-family: 'Arial', sans-serif;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.fcp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+}
+
+.fcp-grid-item {
+  padding: 20px;
+  border-radius: 12px;
+  background: #f2f2f2;
+  transition: 0.3s;
+  text-decoration: none;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.fcp-grid-item:hover {
+  background: #d9e9ff;
+  color: #000;
+}
+
+.fcp-grid-item img {
+  width: 60px;
+  margin-bottom: 10px;
+}
+
+canvas {
+  max-width: 100%;
+  height: auto !important;
+}
+
+input, select, button {
+  width: 100%;
+  max-width: 400px;
+  margin: 5px auto;
+}
+
+.fcp-ad {
+  margin: 20px auto;
+  padding: 10px;
+}
 
