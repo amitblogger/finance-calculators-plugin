@@ -3,22 +3,22 @@
   <p><em>Compare Snowball vs. Avalanche strategy for up to 3 debts</em></p>
 
   <form id="debtForm">
-    <div style="margin-bottom:20px;"><strong>Enter details for up to 3 debts:</strong></div>
-    
+    <div><strong>Enter details for up to 3 debts:</strong></div>
+
     <!-- Debt 1 -->
     <label>Debt 1 Amount: <input type="number" id="amount1" required></label><br>
     <label>Interest Rate (%): <input type="number" id="rate1" required></label><br>
-    <label>Minimum Monthly Payment: <input type="number" id="min1" required></label><br><br>
+    <label>Min Monthly Payment: <input type="number" id="min1" required></label><br><br>
 
     <!-- Debt 2 -->
     <label>Debt 2 Amount: <input type="number" id="amount2"></label><br>
     <label>Interest Rate (%): <input type="number" id="rate2"></label><br>
-    <label>Minimum Monthly Payment: <input type="number" id="min2"></label><br><br>
+    <label>Min Monthly Payment: <input type="number" id="min2"></label><br><br>
 
     <!-- Debt 3 -->
     <label>Debt 3 Amount: <input type="number" id="amount3"></label><br>
     <label>Interest Rate (%): <input type="number" id="rate3"></label><br>
-    <label>Minimum Monthly Payment: <input type="number" id="min3"></label><br><br>
+    <label>Min Monthly Payment: <input type="number" id="min3"></label><br><br>
 
     <label>Total Monthly Budget for Debt Repayment:
       <input type="number" id="budget" required>
@@ -37,8 +37,15 @@
     <button type="button" onclick="calculatePayoff()">Compare Strategies</button>
   </form>
 
-  <div id="payoffResult" style="margin-top: 30px;"></div>
+  <div id="payoffResult" style="margin-top: 20px;"></div>
+  <canvas id="payoffChart" width="400" height="250" style="margin-top:30px;"></canvas>
+  <div style="margin-top: 20px;">
+    <button onclick="downloadPayoffPDF()">Export Result to PDF</button>
+  </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
 function calculatePayoff() {
@@ -54,14 +61,14 @@ function calculatePayoff() {
       debts.push({
         name: `Debt ${i}`,
         amount,
-        rate: rate / 100 / 12, // monthly rate
+        rate: rate / 100 / 12,
         minPay
       });
     }
   }
 
   if (debts.length === 0 || isNaN(budget)) {
-    document.getElementById('payoffResult').innerHTML = "<p>Please fill in at least one debt and your budget.</p>";
+    document.getElementById('payoffResult').innerHTML = "<p>Please enter at least one debt and your budget.</p>";
     return;
   }
 
@@ -72,29 +79,28 @@ function calculatePayoff() {
   const avalancheMonths = simulatePayoff(avalanche, budget);
 
   document.getElementById('payoffResult').innerHTML = `
-    <h3>Results</h3>
+    <h3>Strategy Comparison</h3>
     <ul>
-      <li><strong>Snowball Method:</strong> Pay off in <b>${snowballMonths}</b> months.</li>
-      <li><strong>Avalanche Method:</strong> Pay off in <b>${avalancheMonths}</b> months.</li>
+      <li><strong>Snowball Method:</strong> ${snowballMonths} months</li>
+      <li><strong>Avalanche Method:</strong> ${avalancheMonths} months</li>
     </ul>
-    <p><em>Snowball prioritizes smallest balance first. Avalanche prioritizes highest interest rate.</em></p>
+    <p><em>Snowball = Smallest balance first<br>Avalanche = Highest interest first</em></p>
   `;
+
+  drawPayoffChart(snowballMonths, avalancheMonths);
 }
 
 function simulatePayoff(debts, budget) {
   let month = 0;
-  while (debts.some(d => d.amount > 0) && month < 600) { // max 50 years cap
+  while (debts.some(d => d.amount > 0) && month < 600) {
     month++;
     let extra = budget;
-
     for (let i = 0; i < debts.length; i++) {
       if (debts[i].amount <= 0) continue;
 
       const interest = debts[i].amount * debts[i].rate;
       let payment = debts[i].minPay;
-
       if (i === 0) {
-        // Extra goes to first debt
         payment = Math.min(debts[i].amount + interest, extra);
       }
 
@@ -105,5 +111,44 @@ function simulatePayoff(debts, budget) {
     }
   }
   return month;
+}
+
+function drawPayoffChart(snowball, avalanche) {
+  const ctx = document.getElementById('payoffChart').getContext('2d');
+  if (window.dpChart) window.dpChart.destroy();
+  window.dpChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Snowball', 'Avalanche'],
+      datasets: [{
+        label: 'Months to Pay Off',
+        data: [snowball, avalanche],
+        backgroundColor: ['#2196F3', '#FF9800']
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: {
+          label: function(ctx) {
+            return `${ctx.raw} months`;
+          }
+        }}
+      },
+      scales: {
+        y: { beginAtZero: true, title: { display: true, text: 'Months' } }
+      }
+    }
+  });
+}
+
+function downloadPayoffPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  doc.text("Debt Payoff Comparison", 10, 10);
+  const content = document.getElementById('payoffResult');
+  doc.fromHTML(content.innerHTML, 10, 20);
+  doc.save("debt-payoff.pdf");
 }
 </script>
