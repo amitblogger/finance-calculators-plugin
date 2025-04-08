@@ -19,7 +19,14 @@
   </form>
 
   <div id="paydayResult" style="margin-top: 20px;"></div>
+  <canvas id="paydayChart" width="400" height="250" style="margin-top:30px;"></canvas>
+  <div style="margin-top: 20px;">
+    <button onclick="downloadPaydayPDF()">Export Result to PDF</button>
+  </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
 function calculatePayday() {
@@ -45,5 +52,37 @@ function calculatePayday() {
       <li><strong>Duration:</strong> ${days} Days</li>
     </ul>
   `;
+
+  drawPaydayChart(P, interest);
+}
+
+function drawPaydayChart(principal, interest) {
+  const ctx = document.getElementById('paydayChart').getContext('2d');
+  if (window.pdChart) window.pdChart.destroy();
+  window.pdChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: ['Principal', 'Interest'],
+      datasets: [{
+        data: [principal, interest],
+        backgroundColor: ['#FFC107', '#E91E63'],
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'bottom' }
+      }
+    }
+  });
+}
+
+function downloadPaydayPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  doc.text("Payday Loan Result", 10, 10);
+  const content = document.getElementById('paydayResult');
+  doc.fromHTML(content.innerHTML, 10, 20);
+  doc.save("payday-loan.pdf");
 }
 </script>
